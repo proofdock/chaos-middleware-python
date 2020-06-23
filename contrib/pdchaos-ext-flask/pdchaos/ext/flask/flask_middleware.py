@@ -37,3 +37,5 @@ class FlaskMiddleware(object):
 
         if self.injections and self.injections.get('delay', {}):
             inject.delay(self.injections.get('delay').get('duration'))
+
+        return response

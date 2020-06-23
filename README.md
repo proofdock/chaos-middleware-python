@@ -1,6 +1,6 @@
 # Proofdock chaos middleware for Python
 
-[![Build Status](https://dev.azure.com/proofdockio/chaos/_apis/build/status/chaos-kit/chaos-kit%20-%20production?branchName=master)](https://dev.azure.com/proofdockio/chaos/_build/latest?definitionId=58&branchName=master)
+![CI](https://github.com/proofdock/chaos-middleware-python/workflows/CI/badge.svg?branch=master)
 [![Python versions](https://img.shields.io/pypi/pyversions/proofdock-chaos-kit.svg)](https://www.python.org/)
 
 Practice chaos engineering on Python applications. This project is a collection of features to inject application level failures. Various Python frameworks are supported.
