@@ -1,4 +1,4 @@
-from datetime import time
+import time
 
 
 def delay(seconds: int):

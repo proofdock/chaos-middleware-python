@@ -1,9 +1,9 @@
-# Proofdock chaos middleware for Python
+# Proofdock chaos middleware for Flask
 
 ![CI](https://github.com/proofdock/chaos-middleware-python/workflows/CI/badge.svg?branch=master)
-[![Python versions](https://img.shields.io/pypi/pyversions/proofdock-chaos-middleware-python.svg)](https://www.python.org/)
+[![Python versions](https://img.shields.io/pypi/pyversions/proofdock-chaos-middleware-flask.svg)](https://www.python.org/)
 
-Practice chaos engineering on Python applications. This project is a collection of features to inject application level failures. Various Python frameworks are supported.
+Practice chaos engineering on the Flask framework. This project is a Flask contribution to the `proofdock-chaos-middleware-python` project.
 
 ## Project description
 
@@ -16,7 +16,7 @@ For more information visit our official [website][proofdock] or [documentation][
 This package requires Python 3.5+
 
 ```
-$ pip install -U proofdock-chaos-middleware-python
+$ pip install -U proofdock-chaos-middleware-flask
 ```
 
 ## Usage
@@ -27,6 +27,11 @@ To be defined ...
 
 To be defined ...
 
+## References
+
+- [Proofdock chaos middleware][proofdock_middleware_repo]
+
 [proofdock]: https://proofdock.io/
 [proofdock_docs]: https://docs.proofdock.io/
 [proofdock_support]: https://github.com/proofdock/chaos-support/
+[proofdock_middleware_repo]: https://github.com/proofdock/chaos-middleware-python

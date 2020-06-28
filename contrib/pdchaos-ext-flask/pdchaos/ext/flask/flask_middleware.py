@@ -16,11 +16,6 @@ class FlaskMiddleware(object):
     def init_app(self, app):
         self.app = app
 
-        # load settings from app config
-        settings = self.app.config.get('proofdock', {})
-        self.blocked_urls = settings.get('blocked_urls', {})
-        self.injections = settings.get('injections', {})
-
         self.setup_middleware()
 
     def setup_middleware(self):
@@ -32,10 +27,10 @@ class FlaskMiddleware(object):
         """
 
         # Skip injections if the url is blocked
-        if url.is_blocked(flask.request.url, self.blocked_urls):
+        if self.blocked_urls and url.is_blocked(flask.request.url, self.blocked_urls):
             return response
 
-        if self.injections and self.injections.get('delay', {}):
+        if self.injections and self.injections.get('delay'):
             inject.delay(self.injections.get('delay').get('duration'))
 
         return response
