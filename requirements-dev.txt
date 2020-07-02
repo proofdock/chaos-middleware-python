@@ -1,3 +1,4 @@
+flake8
 pytest
 pytest-cov
-flake8
+setuptools>=47.3.1

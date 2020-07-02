@@ -24,15 +24,13 @@ jobs:
           echo -e "password = ${{ secrets.PYPI_PASSWORD }}" >> ~/.pypirc
 
           # Ensure that we have the latest versions of Twine, Wheel, and Setuptools.
-          python3 -m pip install --upgrade twine wheel setuptools
+          python -m pip install --upgrade twine wheel setuptools
 
           # Build the distributions.
-          python3 setup.py bdist_wheel
-
-          for d in contrib/*/ ; do
+          for d in src/*/ ; do
             pushd .
             cd "$d"
-            python3 setup.py bdist_wheel --dist-dir "$BASEDIR/dist/"
+            python setup.py bdist_wheel --dist-dir "$BASEDIR/dist/"
             popd
           done
 

@@ -19,5 +19,7 @@ venv/
 ENV/
 
 # setuptools
+build/
+dist/
 *egg-info
 .eggs

@@ -15,12 +15,6 @@ For more information visit our official [website][proofdock] or [documentation][
 
 This package requires Python 3.5+
 
-To install flask middleware
-```
-$ pip install -U proofdock-chaos-middleware-flask
-```
-
-If you want to install just core functionalities
 ```
 $ pip install -U proofdock-chaos-middleware-python
 ```
@@ -32,22 +26,6 @@ To be defined ...
 ## Configuration
 
 To be defined ...
-
-## Develop
-
-Go to each folder in the source folder and install packages, e.g:
-
-For core:
-```
-cd src/core
-pip install -e .
-```
-
-For flask contrib:
-```
-cd src/contrib-flask
-pip install -e .
-```
 
 [proofdock]: https://proofdock.io/
 [proofdock_docs]: https://docs.proofdock.io/

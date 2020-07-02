@@ -1,4 +1,4 @@
-# Copyright 2019, Proofdock Authors
+# Copyright 2020, Proofdock Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,16 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from setuptools import find_packages, setup
+"""A setup module for Proofdock Middleware"""
+
+from setuptools import setup, find_namespace_packages
+
+exec(open('pdchaos/middleware/core/version.py').read())
 
 setup(
-    name='proofdock-chaos-middleware-flask',
-    version='0.1.0.dev3',  # noqa
+    name='proofdock-chaos-middleware-python',
+    version=__version__,  # noqa
     author='Proofdock Authors',
     author_email='support@proofdock.io',
     classifiers=[
         'Intended Audience :: Developers',
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
@@ -30,19 +34,13 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description='A chaos engineering framework for Flask applications',
+    description='A chaos engineering framework for Python applications.',
     include_package_data=True,
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
-    install_requires=[
-        'flask >= 0.12.3, < 2.0.0',
-        'proofdock-chaos-middleware-python >= 0.1.dev0, < 1.0.0',
-    ],
     extras_require={},
     license='Apache-2.0',
-    packages=find_packages(exclude=('examples', 'tests',)),
     python_requires='>=3.5.*',
-    namespace_packages=[],
-    url='https://github.com/proofdock/chaos-middleware-python/tree/master/contrib/pdchaos-ext-flask',  # noqa: E501
-    zip_safe=False,
+    packages=find_namespace_packages(include='pdchaos.*'),
+    url='https://github.com/proofdock/chaos-middleware-python',
 )

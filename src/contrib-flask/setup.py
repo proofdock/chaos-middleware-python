@@ -13,12 +13,12 @@
 # limitations under the License.
 """A setup module for Proofdock Middleware"""
 
-from setuptools import find_packages, setup
+from setuptools import setup, find_namespace_packages
 
-exec(open('pdchaos/__init__.py').read())
+exec(open('pdchaos/middleware/contrib/flask/version.py').read())
 
 setup(
-    name='proofdock-chaos-middleware-python',
+    name='proofdock-chaos-middleware-flask',
     version=__version__,  # noqa
     author='Proofdock Authors',
     author_email='support@proofdock.io',
@@ -34,14 +34,17 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description='A chaos engineering framework for Python applications.',
+    description='A chaos engineering framework for Python Flask applications.',
     include_package_data=True,
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
     extras_require={},
     license='Apache-2.0',
     python_requires='>=3.5.*',
-    packages=find_packages(exclude=('tests',)),
-    namespace_packages=[],
+    packages=find_namespace_packages(include='pdchaos.*'),
+    install_requires=[
+        'flask',
+        'proofdock-chaos-middleware-python',
+    ],
     url='https://github.com/proofdock/chaos-middleware-python',
 )

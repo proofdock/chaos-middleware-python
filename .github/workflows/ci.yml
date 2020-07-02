@@ -18,11 +18,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Prepare checks
-        run: python -m pip install -r requirements-dev.txt
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip install src/core
+          python -m pip install src/contrib-flask
       - name: Check code style
-        run: |
-          flake8 pdchaos/
-          flake8 contrib/
-      - name: Test pdchaos
-        run: |
-          python -m pytest
+        run: flake8 src/
+      - name: Run tests
+        run: python -m pytest
