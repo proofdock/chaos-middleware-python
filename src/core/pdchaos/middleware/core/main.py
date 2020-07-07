@@ -1,15 +1,14 @@
-from typing import List
-
-from pdchaos.middleware.core import url, inject
+from pdchaos.middleware.core import HEADER_ATTACK, model, inject
 
 
-def execute_chaos(called_path: str, blocked_paths: List[str], requested_headers: dict, injections: dict):
+def execute_chaos(called_path: str, requested_headers: dict):
     """Execute chaos"""
-    if blocked_paths and url.is_blocked(called_path, blocked_paths):
-        return
+    if requested_headers:
+        if HEADER_ATTACK in requested_headers:
+            attack = model.parse_attack(requested_headers.get(HEADER_ATTACK))
+            for a in attack:
+                if a['type'] == 'delay':
+                    inject.delay(a['value'])
 
-    if injections and injections.get('delay'):
-        inject.delay(injections.get('delay').get('duration'))
-
-    if injections and injections.get('exception'):
-        inject.raise_exception(injections.get('exception'))
+                if a['type'] == 'failure':
+                    inject.failure(a['value'])

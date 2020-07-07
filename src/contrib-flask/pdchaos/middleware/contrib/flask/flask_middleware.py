@@ -5,10 +5,8 @@ from pdchaos.middleware.core.main import execute_chaos
 
 class FlaskMiddleware(object):
 
-    def __init__(self, app=None, blocked_paths=None, injections=None):
+    def __init__(self, app=None):
         self.app = app
-        self.blocked_paths = blocked_paths
-        self.injections = injections
 
         if self.app is not None:
             self.init_app(app)
@@ -22,6 +20,6 @@ class FlaskMiddleware(object):
         See: https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.after_request
         """
 
-        execute_chaos(request.path, self.blocked_paths, request.headers, self.injections)
+        execute_chaos(request.path, request.headers)
 
         return response

@@ -16,11 +16,15 @@ def test_failed_inject_delay(time):
     assert not time.sleep.called, 'Delay should not have been called'
 
 
+def test_failed_inject_delay():
+    inject.delay("abc")
+
+
 def test_successful_inject_specified_exception():
     with pytest.raises(NotImplementedError):
-        inject.raise_exception('NotImplementedError')
+        inject.failure('NotImplementedError')
 
 
 def test_successful_inject_default_exception():
     with pytest.raises(inject.MiddlewareDisruptionException):
-        inject.raise_exception('DoesNotExistError')
+        inject.failure('DoesNotExistError')

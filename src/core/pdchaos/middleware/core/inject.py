@@ -2,8 +2,13 @@ import pydoc
 import time
 
 
-def delay(seconds: int):
+def delay(input_seconds):
     """Delay the response"""
+    try:
+        seconds = int(input_seconds)
+    except ValueError:
+        return
+
     if seconds > 0:
         time.sleep(seconds)
 
@@ -12,7 +17,7 @@ class MiddlewareDisruptionException(Exception):
     pass
 
 
-def raise_exception(exception: str):
+def failure(exception: str):
     """Raise an exception. If exception is not found then a ChaosMiddlewareException is raised."""
     exception_to_raise = pydoc.locate(exception)
 

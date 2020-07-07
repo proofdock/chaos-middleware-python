@@ -41,6 +41,7 @@ setup(
     extras_require={},
     license='Apache-2.0',
     python_requires='>=3.5.*',
+    install_requires=['marshmallow'],
     packages=find_namespace_packages(include='pdchaos.*'),
     url='https://github.com/proofdock/chaos-middleware-python',
 )
