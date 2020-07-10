@@ -7,13 +7,13 @@ def execute_chaos(called_path: str, requested_headers: dict):
         if HEADER_ATTACK in requested_headers:
             attack = model.parse_attack(requested_headers.get(HEADER_ATTACK))
             for a in attack:
-                is_active = True
+                is_active = dice.roll(a.get('probability'))
 
-                if a.get('probability'):
-                    is_active = dice.roll(a['probability'])
+                if not is_active:
+                    continue
 
-                if a['type'] == 'delay' and is_active:
+                if a['type'] == 'delay':
                     inject.delay(a['value'])
 
-                if a['type'] == 'failure' and is_active:
+                if a['type'] == 'failure':
                     inject.failure(a['value'])
