@@ -11,12 +11,12 @@ def test_successful_inject_delay(time):
 
 
 @patch('pdchaos.middleware.core.inject.time')
-def test_failed_inject_delay(time):
+def test_inject_negative_delay(time):
     inject.delay(-5)
     assert not time.sleep.called, 'Delay should not have been called'
 
 
-def test_failed_inject_delay():
+def test_inject_invalid_delay():
     inject.delay("abc")
 
 
