@@ -10,8 +10,8 @@ def roll(input_probability: str) -> bool:
         _min = 1
         _max = 100
         if _min <= probability <= _max:
-            diced_value = random.randint(_min, _max)
-            return diced_value <= probability
+            rolled_value = random.randint(_min, _max)
+            return rolled_value <= probability
         else:
             logger.warn("Skipping probability '{}'. Provided number is out of range. Enter a number between 1 and 100."
                         .format(roll.__name__))
