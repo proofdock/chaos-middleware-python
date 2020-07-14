@@ -1,6 +1,6 @@
 from flask import request
 
-from pdchaos.middleware.core.main import execute_chaos
+from pdchaos.middleware.core.main import execute
 
 
 class FlaskMiddleware(object):
@@ -20,6 +20,6 @@ class FlaskMiddleware(object):
         See: https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.after_request
         """
 
-        execute_chaos(request.path, request.headers)
+        execute(request.path, request.method, request.headers)
 
         return response
