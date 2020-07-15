@@ -17,9 +17,10 @@ def roll(input_probability: str) -> bool:
             rolled_value = random.randint(_min, _max)
             return rolled_value <= probability
         else:
-            logger.warn("Skipping probability '{}'. Provided number is out of range. Enter a number between 1 and 100."
-                        .format(roll.__name__))
+            logger.warning(
+                "Skipping probability '{}'. Provided number is out of range. Enter a number between 1 and 100.".format(
+                    roll.__name__))
             return False
     except ValueError:
-        logger.warn("Skipping probability '{}'. '{}' is not a valid value.".format(roll.__name__, input_probability))
+        logger.warning("Skipping probability '{}'. '{}' is not a valid value.".format(roll.__name__, input_probability))
         return False

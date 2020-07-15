@@ -7,7 +7,7 @@ def parse_paths(config: dict):
         result = paths_schemas.load(config)
 
     except ValidationError as x:
-        logger.warn("Invalid chaos configuration schema. Reason: {%s}", x)
+        logger.warning("Invalid chaos configuration schema. Reason: {%s}", x)
         result = []
 
     return result
@@ -18,7 +18,7 @@ def parse_attack(header: str):
         result = attack_schemas.loads(header)
 
     except ValidationError:
-        logger.warn("Invalid attack request. Skipping attack.")
+        logger.warning("Invalid attack request. Skipping attack.")
         result = []
 
     return result

@@ -42,6 +42,17 @@ class TestFlaskMiddleware:
         assert middleware.app == app
         assert app.after_request.called
 
+    def test_constructor_and_proper_context(self):
+        app = mock.Mock(config={
+            'CHAOS_MIDDLEWARE_SERVICE_NAME': 'service-application-a',
+            'CHAOS_MIDDLEWARE_API_TOKEN': 'ey...x9',
+            'CHAOS_MIDDLEWARE_SERVICE_ENVIRONMENT': 'INT',
+        })
+        middleware = flask_middleware.FlaskMiddleware(app=app)
+
+        assert middleware.app == app
+        assert app.after_request.called
+
     def test_call_without_proofdock_headers(self):
         app = self.create_app()
         middleware = flask_middleware.FlaskMiddleware(app=app)

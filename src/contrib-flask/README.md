@@ -25,7 +25,13 @@ To be defined ...
 
 ## Configuration
 
-To be defined ...
+Configure your Flask configuration with the following properties:
+
+| Property | Flask configuration | Description |
+| ---      | ---                 | ---         |
+| `CHAOS_MIDDLEWARE_SERVICE_NAME` | `app.config.setdefault('CHAOS_MIDDLEWARE_SERVICE_NAME', '')` | Set up a service application name for your Flask app |
+| `CHAOS_MIDDLEWARE_SERVICE_ENVIRONMENT` | `app.config.setdefault('CHAOS_MIDDLEWARE_SERVICE_ENVIRONMENT', '')` | The environment in which your service application is running |
+| `CHAOS_MIDDLEWARE_API_TOKEN` | `app.config.setdefault('CHAOS_MIDDLEWARE_API_TOKEN', '')` | The API token to connect to Proofdock's Chaos API |
 
 ## References
 

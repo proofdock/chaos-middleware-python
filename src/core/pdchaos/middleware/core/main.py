@@ -5,6 +5,7 @@ import yaml
 from logzero import logger
 from pdchaos.middleware.core import HEADER_ATTACK, model, inject, dice
 
+loaded_context = contextvars.ContextVar('loaded_context', default={})
 loaded_config = contextvars.ContextVar('loaded_config', default=None)
 
 
@@ -25,6 +26,11 @@ def load_config():
 
     else:
         return len(loaded_config.get()) != 0
+
+
+def register(service_app_context: dict):
+    """Register a service application"""
+    loaded_context.set(service_app_context)
 
 
 def execute(called_path: str, called_method: str, requested_headers: dict):

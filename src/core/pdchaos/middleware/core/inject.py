@@ -13,10 +13,10 @@ def delay(input_seconds):
             logger.debug("Delay {} second(s)".format(input_seconds))
             time.sleep(seconds)
         else:
-            logger.warn("Skipping attack '{}'. Enter a positive number.".format(delay.__name__))
+            logger.warning("Skipping attack '{}'. Enter a positive number.".format(delay.__name__))
             return
     except ValueError:
-        logger.warn("Skipping attack '{}'. '{}' is not a valid value.".format(delay.__name__, input_seconds))
+        logger.warning("Skipping attack '{}'. '{}' is not a valid value.".format(delay.__name__, input_seconds))
         return
 
 
@@ -33,6 +33,6 @@ def failure(input_exception: str):
         logger.debug("Raise exception '{}'".format(input_exception))
         raise exception
 
-    logger.warn("'{}' is not a valid exception. Raising default exception '{}'.".format(
+    logger.warning("'{}' is not a valid exception. Raising default exception '{}'.".format(
         MiddlewareDisruptionException.__name__, input_exception))
     raise MiddlewareDisruptionException
