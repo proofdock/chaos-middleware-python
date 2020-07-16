@@ -3,7 +3,7 @@ import uuid
 from flask import request, Flask
 from logzero import logger
 
-from pdchaos.middleware.core.main import execute, register
+from pdchaos.middleware.core.main import attack, register
 
 
 def _load_from_config(app: Flask, key: str):
@@ -30,7 +30,7 @@ def _after_request(response):
     See: https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.after_request
     """
 
-    execute(request.path, request.method, request.headers)
+    attack(request.path, request.headers)
 
     return response
 

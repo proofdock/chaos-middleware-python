@@ -62,7 +62,7 @@ class TestFlaskMiddleware:
             assert middleware.app == app
 
     def test_call_with_header_attack_delay(self):
-        attack_request = '[{"type": "delay", "value": "1"}]'
+        attack_request = '[{"action": "delay", "value": "1"}]'
         app = self.create_app()
         flask_middleware.FlaskMiddleware(app=app)
 
@@ -70,7 +70,7 @@ class TestFlaskMiddleware:
             app.process_response(None)
 
     def test_call_with_header_attack_fault(self):
-        attack_request = '[{"type": "failure", "value": "DoesNotExistError"}]'
+        attack_request = '[{"action": "fault", "value": "DoesNotExistError"}]'
         app = self.create_app()
         flask_middleware.FlaskMiddleware(app=app)
 
