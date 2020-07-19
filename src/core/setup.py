@@ -45,7 +45,7 @@ setup(
         'contextvars;python_version<"3.7"',
         'logzero',
         'marshmallow',
-        'pyyaml>=5.3.1'
+        'requests'
     ],
     packages=find_namespace_packages(include='pdchaos.*'),
     url='https://github.com/proofdock/chaos-middleware-python',

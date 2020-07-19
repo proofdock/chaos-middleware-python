@@ -1,10 +1,10 @@
-from unittest import mock
 from unittest.mock import patch
 
+from pdchaos.middleware import core
 from pdchaos.middleware.core import HEADER_ATTACK
-from pdchaos.middleware.core.main import attack, loaded_config, loaded_context
+from pdchaos.middleware.core.main import attack, loaded_config, loaded_context, register
 
-from tests.data import config_provider
+from tests.data import config_provider, context_provider
 
 
 @patch('pdchaos.middleware.core.main.inject')
@@ -58,7 +58,7 @@ def test_core_with_target_based_header_attack_fault(inject):
     headers = {
         HEADER_ATTACK: '[{"action":"fault","value":"DoesNotExistError", "target":{"service":"A", "route":"/hello"}}]'
     }
-    loaded_context.set({'SERVICE_NAME': 'A'})
+    loaded_context.set({core.CTX_SERVICE_NAME: 'A'})
 
     # act
     attack("/hello", headers)
@@ -71,25 +71,50 @@ def test_core_with_target_based_header_attack_fault(inject):
     inject.failure.assert_called_once_with(failure_value)
 
 
-@patch('pdchaos.middleware.core.main.os')
-def test_core_with_chaos_configuration(os):
-    os.path.exists.return_value = True
-    loaded_config.set(None)
+@patch('pdchaos.middleware.core.main.inject')
+def test_core_with_chaos_configuration(inject):
+    # arrange
+    loaded_config.set(config_provider.default())
 
-    with patch("builtins.open", mock.mock_open(read_data=config_provider.default())) as mock_file:
-        attack("/hello", None)
-        mock_file.assert_called_with("chaos-config.json")
+    # act
+    attack("/hello", None)
+    attack("/api", None)
 
-        loaded_config.set({})
+    # clear
+    loaded_config.set({})
+
+    # assert
+    assert inject.delay.called
+    assert not inject.failure.called, 'Failure should not have been called'
 
 
-@patch('pdchaos.middleware.core.main.os')
-def test_core_with_invalid_chaos_configuration(os):
-    os.path.exists.return_value = True
-    loaded_config.set(None)
+@patch('pdchaos.middleware.core.main.inject')
+def test_core_with_invalid_chaos_configuration(inject):
+    # arrange
+    loaded_config.set(config_provider.invalid())
 
-    with patch("builtins.open", mock.mock_open(read_data=config_provider.invalid())) as mock_file:
-        attack("/hello", None)
-        mock_file.assert_called_with("chaos-config.json")
+    # act
+    attack("/hello", None)
 
-        loaded_config.set({})
+    # clear
+    loaded_config.set({})
+
+    # assert
+    assert not inject.delay.called, 'Delay should not have been called'
+    assert not inject.failure.called, 'Failure should not have been called'
+
+
+@patch('pdchaos.middleware.core.main.asyncio')
+@patch('pdchaos.middleware.core.main.loader')
+def test_core_and_its_async_poller(loader, asyncio):
+    # arrange
+    loader.load.return_value = {}
+
+    # act
+    register(context_provider.default())
+
+    # clear
+    loaded_context.set({})
+
+    # assert
+    assert asyncio.get_event_loop.called

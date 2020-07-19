@@ -2,7 +2,7 @@ import uuid
 
 from flask import request, Flask
 from logzero import logger
-
+from pdchaos.middleware import core
 from pdchaos.middleware.core.main import attack, register
 
 
@@ -17,10 +17,11 @@ def _load_from_config(app: Flask, key: str):
 
 def _load_context(app: Flask) -> dict:
     result = {
-        'SERVICE_ENV': _load_from_config(app, 'CHAOS_MIDDLEWARE_SERVICE_ENVIRONMENT'),
-        'SERVICE_ID': str(uuid.uuid4()),
-        'SERVICE_NAME': _load_from_config(app, 'CHAOS_MIDDLEWARE_SERVICE_NAME'),
-        'API_TOKEN': _load_from_config(app, 'CHAOS_MIDDLEWARE_API_TOKEN'),
+        core.CTX_SERVICE_ENV: _load_from_config(app, 'CHAOS_MIDDLEWARE_SERVICE_ENVIRONMENT'),
+        core.CTX_SERVICE_ID: str(uuid.uuid4()),
+        core.CTX_SERVICE_NAME: _load_from_config(app, 'CHAOS_MIDDLEWARE_SERVICE_NAME'),
+        core.CTX_API_TOKEN: _load_from_config(app, 'CHAOS_MIDDLEWARE_API_TOKEN'),
+        core.CTX_API_PROVIDER: _load_from_config(app, 'CHAOS_MIDDLEWARE_API_PROVIDER'),
     }
     return result
 
