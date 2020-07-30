@@ -1,4 +1,5 @@
 from unittest import mock
+from unittest.mock import patch
 
 import flask
 import pytest
@@ -42,7 +43,8 @@ class TestFlaskMiddleware:
         assert middleware.app == app
         assert app.after_request.called
 
-    def test_constructor_and_proper_context(self):
+    @patch('pdchaos.middleware.contrib.flask.flask_middleware.register')
+    def test_constructor_and_proper_context(self, register):
         app = mock.Mock(config={
             'CHAOS_MIDDLEWARE_SERVICE_NAME': 'service-application-a',
             'CHAOS_MIDDLEWARE_API_TOKEN': 'ey...x9',

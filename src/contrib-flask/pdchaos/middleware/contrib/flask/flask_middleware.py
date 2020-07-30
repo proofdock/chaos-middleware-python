@@ -6,10 +6,10 @@ from pdchaos.middleware import core
 from pdchaos.middleware.core.main import attack, register
 
 
-def _load_from_config(app: Flask, key: str):
+def _load_from_config(app: Flask, key: str, is_essential: bool = True) -> str:
     result = app.config.get(key, '')
 
-    if not result:
+    if not result and is_essential:
         logger.warning("'{}' has not been set. The chaos middleware may not work as expected.".format(key))
 
     return result
@@ -21,7 +21,8 @@ def _load_context(app: Flask) -> dict:
         core.CTX_SERVICE_ID: str(uuid.uuid4()),
         core.CTX_SERVICE_NAME: _load_from_config(app, 'CHAOS_MIDDLEWARE_SERVICE_NAME'),
         core.CTX_API_TOKEN: _load_from_config(app, 'CHAOS_MIDDLEWARE_API_TOKEN'),
-        core.CTX_API_PROVIDER: _load_from_config(app, 'CHAOS_MIDDLEWARE_API_PROVIDER'),
+        core.CTX_API_URL: _load_from_config(app, 'CHAOS_MIDDLEWARE_API_URL', False),
+        core.CTX_API_PROVIDER: _load_from_config(app, 'CHAOS_MIDDLEWARE_API_PROVIDER', False),
     }
     return result
 

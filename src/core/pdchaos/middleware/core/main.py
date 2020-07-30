@@ -11,11 +11,9 @@ loaded_config = contextvars.ContextVar('loaded_config', default=None)
 
 async def _load_configuration(interval=30):
     while True:
-        await asyncio.sleep(interval)
-
         try:
             # Fetch
-            config = await loader.load(loaded_context.get())
+            config = loader.load(loaded_context.get())
 
             # Validate
             parse.attack_as_dict(config)
@@ -23,7 +21,9 @@ async def _load_configuration(interval=30):
             # Configure
             loaded_config.set(config)
         except Exception as e:
-            logger.warning("Unable to load chaos configuration. Reason: {}".format(e))
+            logger.warning("Unable to load attack configuration. Reason: {}".format(e))
+
+        await asyncio.sleep(interval)
 
 
 def register(service_app_context: dict):
@@ -46,12 +46,15 @@ def _init_poller():
     is_qualified_to_poll = bool(ctx.get(core.CTX_API_TOKEN) and ctx.get(core.CTX_SERVICE_NAME))
 
     if is_qualified_to_poll:
-        logger.debug("Is qualified to poll chaos configuration")
-        asyncio.get_event_loop().create_task(_load_configuration())
+        interval = 30
+        logger.debug("Synchronize attack configuration every %s seconds" % interval)
+        loop = asyncio.get_event_loop()
+        loop.create_task(_load_configuration(interval))
+        loop.run_forever()
 
     else:
-        logger.warn("Skip chaos configuration polling. Reason: Is not qualified to poll."
-                    " Please provide essential information such as service name and/or API token.")
+        logger.warn("Skip synchronizing attack configuration. Reason: Application is not qualified to synchronize."
+                    " Please provide essential information, e.g. service name and API token.")
 
 
 def attack(called_path: str, requested_headers: dict):
