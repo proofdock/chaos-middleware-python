@@ -1,60 +1,34 @@
-import asyncio
 import contextvars
+from typing import Dict
 
 from logzero import logger
 from pdchaos.middleware import core
-from pdchaos.middleware.core import inject, dice, parse, loader
+from pdchaos.middleware.core import config, dice, inject, loader, parse
 
-loaded_context = contextvars.ContextVar('loaded_context', default={})
-loaded_config = contextvars.ContextVar('loaded_config', default=None)
-
-
-async def _load_configuration(interval=30):
-    while True:
-        try:
-            # Fetch
-            config = loader.load(loaded_context.get())
-
-            # Validate
-            parse.attack_as_dict(config)
-
-            # Configure
-            loaded_config.set(config)
-        except Exception as e:
-            logger.warning("Unable to load attack configuration. Reason: {}".format(e))
-
-        await asyncio.sleep(interval)
+loaded_app_config = contextvars.ContextVar('loaded_app_config', default={})
+loaded_attack_config = contextvars.ContextVar('loaded_attack_config', default=None)
 
 
-def register(service_app_context: dict):
-    """Register a service application"""
-    _provide_default_context(service_app_context)
-    loaded_context.set(service_app_context)
-    _init_poller()
+def register(app_config: config.AppConfig):
+    """Register an application"""
+    loaded_app_config.set(app_config)
+    logger.info(loaded_app_config.get())
+    _init_attack_loader()
 
 
-def _provide_default_context(service_app_context):
-    if not service_app_context.get(core.CTX_API_PROVIDER):
-        service_app_context[core.CTX_API_PROVIDER] = 'proofdock'
+def set_attack(attack: Dict):
+    try:
+        # Validate
+        parsed_attack = parse.attack_as_dict(attack)
+        # Configure
+        loaded_attack_config.set(parsed_attack)
+    except Exception as e:
+        logger.warning("Unable to set attack configuration. Reason: {}".format(e))
 
-    if not service_app_context.get(core.CTX_API_URL):
-        service_app_context[core.CTX_API_URL] = 'https://chaosapi.proofdock.io/'
 
-
-def _init_poller():
-    ctx = loaded_context.get()
-    is_qualified_to_poll = bool(ctx.get(core.CTX_API_TOKEN) and ctx.get(core.CTX_SERVICE_NAME))
-
-    if is_qualified_to_poll:
-        interval = 30
-        logger.debug("Synchronize attack configuration every %s seconds" % interval)
-        loop = asyncio.get_event_loop()
-        loop.create_task(_load_configuration(interval))
-        loop.run_forever()
-
-    else:
-        logger.warn("Skip synchronizing attack configuration. Reason: Application is not qualified to synchronize."
-                    " Please provide essential information, e.g. service name and API token.")
+def _init_attack_loader():
+    attack_loader = loader.get(loaded_app_config.get())
+    attack_loader.load(set_attack)
 
 
 def attack(called_path: str, requested_headers: dict):
@@ -66,8 +40,8 @@ def attack(called_path: str, requested_headers: dict):
             _execute_attacks(attacks, called_path)
 
     # Server side configuration
-    elif loaded_config.get():
-        attacks = parse.attack_as_dict(loaded_config.get())
+    elif loaded_attack_config.get():
+        attacks = parse.attack_as_dict(loaded_attack_config.get())
         if attacks:
             _execute_attacks(attacks, called_path)
 
@@ -96,7 +70,9 @@ def _is_aimed_for_attack(_attack, called_route):
         return True
 
     service = target.get(core.ATTACK_KEY_TARGET_SERVICE)
-    is_svc_targeted = (service and service == loaded_context.get().get(core.CTX_SERVICE_NAME)) or not service
+    is_svc_targeted = \
+        (service and service == loaded_app_config.get().get(config.AppConfig.APPLICATION_NAME)) \
+        or not service
 
     route = target.get(core.ATTACK_KEY_TARGET_ROUTE)
     is_route_targeted = (route and route == called_route) or not route

@@ -46,9 +46,9 @@ class TestFlaskMiddleware:
     @patch('pdchaos.middleware.contrib.flask.flask_middleware.register')
     def test_constructor_and_proper_context(self, register):
         app = mock.Mock(config={
-            'CHAOS_MIDDLEWARE_SERVICE_NAME': 'service-application-a',
+            'CHAOS_MIDDLEWARE_SAPPLICATION_NAME': 'service-application-a',
             'CHAOS_MIDDLEWARE_API_TOKEN': 'ey...x9',
-            'CHAOS_MIDDLEWARE_SERVICE_ENVIRONMENT': 'INT',
+            'CHAOS_MIDDLEWARE_APPLICATION_ENVIRONMENT': 'INT',
         })
         middleware = flask_middleware.FlaskMiddleware(app=app)
 
