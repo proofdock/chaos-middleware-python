@@ -1,3 +1,5 @@
+from typing import Dict
+
 import marshmallow
 from logzero import logger
 from pdchaos.middleware.core import model
@@ -17,7 +19,7 @@ def attack_as_str(_input: str):
     return result
 
 
-def attack_as_dict(_input: dict):
+def attack_as_dict(_input: Dict):
     """Parses the attack schema. Returns an empty list if schema is invalid."""
     try:
         result = model.attack_schemas.load(_input)

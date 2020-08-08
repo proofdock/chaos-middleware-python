@@ -1,5 +1,5 @@
 from unittest import mock
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 
 import flask
 import pytest
@@ -45,15 +45,12 @@ class TestFlaskMiddleware:
 
     @patch('pdchaos.middleware.contrib.flask.flask_middleware.register')
     def test_constructor_and_proper_context(self, register):
-        app = mock.Mock(config={
-            'CHAOS_MIDDLEWARE_SERVICE_NAME': 'service-application-a',
-            'CHAOS_MIDDLEWARE_API_TOKEN': 'ey...x9',
-            'CHAOS_MIDDLEWARE_SERVICE_ENVIRONMENT': 'INT',
-        })
+        app = mock.Mock()
         middleware = flask_middleware.FlaskMiddleware(app=app)
 
         assert middleware.app == app
         assert app.after_request.called
+        app.config.setdefault.assert_called_once_with("CHAOS_MIDDLEWARE_APPLICATION_ID", ANY)
 
     def test_call_without_proofdock_headers(self):
         app = self.create_app()
