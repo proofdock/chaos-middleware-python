@@ -9,8 +9,8 @@ class AttackLoader(metaclass=ABCMeta):
     """
     This class is a base class for implementing different type of attack config loaders.
 
-    Example loader can load attack configuration from file, network or any other place. Loader can as well
-    periodically pull for new configurations.
+    For example, different loaders implementation can load an attack configuration from a file, network or other source.
+    The loading mechanism depends on the configured settings.
     """
 
     @abstractmethod
@@ -28,6 +28,6 @@ def get(app_config: AppConfig) -> AttackLoader:
         return ProofdockAttackLoader(app_config)
     else:
         logger.warn(
-            "Unable to find attack loader provider '{}'. "
-            "Please sets  a valid CHAOS_MIDDLEWARE_API_PROVIDER, e.g. 'proofdock'".format(provider))
+            "Unable to find an attack loader provider '{}'. "
+            "Please set a valid CHAOS_MIDDLEWARE_API_PROVIDER, e.g. 'proofdock'".format(provider))
         return None

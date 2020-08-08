@@ -1,8 +1,9 @@
 from unittest.mock import patch, Mock
 
 from pdchaos.middleware.core import HEADER_ATTACK
-from pdchaos.middleware.core.main import attack, loaded_app_config, loaded_attack_config, register
+from pdchaos.middleware.core.main import attack, register
 from pdchaos.middleware.core.config import AppConfig
+import pdchaos.middleware.core.main as core_main
 
 from tests.data import attack_config_provider, app_config_provider
 
@@ -58,13 +59,13 @@ def test_core_with_target_based_header_attack_fault(inject):
     headers = {
         HEADER_ATTACK: '[{"action":"fault","value":"DoesNotExistError", "target":{"service":"A", "route":"/hello"}}]'
     }
-    loaded_app_config.set({AppConfig.APPLICATION_NAME: 'A'})
+    core_main.loaded_app_config = {AppConfig.APPLICATION_NAME: 'A'}
 
     # act
     attack("/hello", headers)
 
     # clear
-    loaded_app_config.set({})
+    core_main.loaded_app_config = {}
 
     # assert
     assert not inject.delay.called, 'Delay should not have been called'
@@ -74,14 +75,14 @@ def test_core_with_target_based_header_attack_fault(inject):
 @patch('pdchaos.middleware.core.main.inject')
 def test_core_with_attack_configuration(inject):
     # arrange
-    loaded_attack_config.set(attack_config_provider.default())
+    core_main.loaded_attack_config = attack_config_provider.default()
 
     # act
     attack("/hello", None)
     attack("/api", None)
 
     # clear
-    loaded_attack_config.set({})
+    core_main.loaded_attack_config = {}
 
     # assert
     assert inject.delay.called
@@ -91,13 +92,13 @@ def test_core_with_attack_configuration(inject):
 @patch('pdchaos.middleware.core.main.inject')
 def test_core_with_invalid_attack_configuration(inject):
     # arrange
-    loaded_app_config.set(attack_config_provider.invalid())
+    core_main.loaded_app_config = attack_config_provider.invalid()
 
     # act
     attack("/hello", None)
 
     # clear
-    loaded_app_config.set({})
+    core_main.loaded_app_config = {}
 
     # assert
     assert not inject.delay.called, 'Delay should not have been called'
@@ -114,7 +115,7 @@ def test_core_and_its_register(loader_factory):
     register(app_config_provider.default())
 
     # clear
-    loaded_app_config.set({})
+    core_main.loaded_app_config = {}
 
     # assert
     assert loader_mock.load.called_once_with(app_config_provider.default())

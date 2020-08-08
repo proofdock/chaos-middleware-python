@@ -1,18 +1,17 @@
-import contextvars
 from typing import Dict
 
 from logzero import logger
 from pdchaos.middleware import core
 from pdchaos.middleware.core import config, dice, inject, loader, parse
 
-loaded_app_config = contextvars.ContextVar('loaded_app_config', default={})
-loaded_attack_config = contextvars.ContextVar('loaded_attack_config', default=None)
+loaded_app_config = {}
+loaded_attack_config = None
 
 
 def register(app_config: config.AppConfig):
     """Register an application"""
-    loaded_app_config.set(app_config)
-    logger.info(loaded_app_config.get())
+    global loaded_app_config
+    loaded_app_config = app_config
     _init_attack_loader()
 
 
@@ -21,13 +20,15 @@ def set_attack(attack: Dict):
         # Validate
         parsed_attack = parse.attack_as_dict(attack)
         # Configure
-        loaded_attack_config.set(parsed_attack)
+        global loaded_attack_config
+        loaded_attack_config = parsed_attack
+        logger.debug("New attack configuration: {}".format(attack))
     except Exception as e:
         logger.warning("Unable to set attack configuration. Reason: {}".format(e))
 
 
 def _init_attack_loader():
-    attack_loader = loader.get(loaded_app_config.get())
+    attack_loader = loader.get(loaded_app_config)
     attack_loader.load(set_attack)
 
 
@@ -40,8 +41,8 @@ def attack(called_path: str, requested_headers: dict):
             _execute_attacks(attacks, called_path)
 
     # Server side configuration
-    elif loaded_attack_config.get():
-        attacks = parse.attack_as_dict(loaded_attack_config.get())
+    elif loaded_attack_config:
+        attacks = parse.attack_as_dict(loaded_attack_config)
         if attacks:
             _execute_attacks(attacks, called_path)
 
@@ -71,7 +72,7 @@ def _is_aimed_for_attack(_attack, called_route):
 
     service = target.get(core.ATTACK_KEY_TARGET_SERVICE)
     is_svc_targeted = \
-        (service and service == loaded_app_config.get().get(config.AppConfig.APPLICATION_NAME)) \
+        (service and service == loaded_app_config.get(config.AppConfig.APPLICATION_NAME)) \
         or not service
 
     route = target.get(core.ATTACK_KEY_TARGET_ROUTE)

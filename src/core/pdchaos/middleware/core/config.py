@@ -12,4 +12,4 @@ class AppConfig(metaclass=ABCMeta):
 
     @abstractmethod
     def get(self, item: str, default=None) -> str:
-        pass
+        raise NotImplementedError("Function get is not implemented")

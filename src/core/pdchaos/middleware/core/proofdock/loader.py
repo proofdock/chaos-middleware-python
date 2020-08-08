@@ -2,7 +2,6 @@ import json
 import threading
 from typing import Callable, Dict
 
-from logzero import logger
 from pdchaos.middleware.core.config import AppConfig
 from pdchaos.middleware.core.loader import AttackLoader
 from pdchaos.middleware.core.proofdock.session import (client_session,
@@ -18,15 +17,13 @@ class ProofdockAttackLoader(AttackLoader):
         self._trigger_load_timer(set_attack_func)
 
     def _trigger_load_timer(self, set_attack_func: Callable[[Dict], None]):
-        threading.Timer(interval=10.0, function=self._load_task, args=(set_attack_func,)).start()
+        threading.Timer(interval=30.0, function=self._load_task, args=(set_attack_func,)).start()
 
     def _load_task(self, set_attack_func: Callable[[Dict], None]):
-        logger.debug("Fetching attack configuration from Proofdock\'s Chaos API ...")
         if not bool(self._app_config.get(AppConfig.API_TOKEN) and self._app_config.get(AppConfig.APPLICATION_NAME)):
-            raise Exception('Please set API token and service name')
+            raise Exception('Please set an API token and a service name in your configuration')
         with client_session(self._app_config.get(AppConfig.API_TOKEN), verify_tls=False) as session:
             response = self._request(session)
-            logger.debug("Fetched attack configuration")
             set_attack_func(response)
         self._trigger_load_timer(set_attack_func)
 
