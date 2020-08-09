@@ -43,7 +43,7 @@ class TestFlaskMiddleware:
         assert middleware.app == app
         assert app.after_request.called
 
-    @patch('pdchaos.middleware.contrib.flask.flask_middleware.register')
+    @patch('pdchaos.middleware.core.chaos.register')
     def test_constructor_and_proper_context(self, register):
         app = mock.Mock()
         middleware = flask_middleware.FlaskMiddleware(app=app)

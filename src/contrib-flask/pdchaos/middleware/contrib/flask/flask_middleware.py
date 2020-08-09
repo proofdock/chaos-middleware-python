@@ -1,7 +1,7 @@
 from flask import Flask, request
 from logzero import logger
 from pdchaos.middleware.contrib.flask.config import FlaskConfig
-from pdchaos.middleware.core.main import attack, register
+from pdchaos.middleware.core import chaos
 
 
 def _after_request(response):
@@ -9,7 +9,7 @@ def _after_request(response):
     See: https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.after_request
     """
 
-    attack(request.path, request.headers)
+    chaos.attack(request.path, request.headers)
 
     return response
 
@@ -26,7 +26,7 @@ class FlaskMiddleware(object):
         self.app = app
         try:
             config = FlaskConfig(app)
-            register(config)
+            chaos.register(config)
             self.app.after_request(_after_request)
         except Exception as ex:
             logger.error("Unable to configure chaos middlewere. Error: %s", ex, stack_info=True)
