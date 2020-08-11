@@ -1,10 +1,14 @@
 HEADER_ATTACK = "x-proofdock-attack"
 
+# Attack actions keys
+ATTACK_KEY_ACTIONS = "actions"
+ATTACK_KEY_ACTION_NAME = "name"
+ATTACK_KEY_VALUE = "value"
 ATTACK_KEY_TARGET_ROUTE = "route"
-ATTACK_KEY_TARGET_SERVICE = "service"
-ATTACK_KEY_TARGET = "target"
 ATTACK_ACTION_FAULT = "fault"
 ATTACK_ACTION_DELAY = "delay"
 ATTACK_KEY_PROBABILITY = "probability"
-ATTACK_KEY_VALUE = "value"
-ATTACK_KEY_ACTION = "action"
+
+# Target keys
+ATTACK_KEY_TARGET = "target"
+ATTACK_KEY_TARGET_APPLICATION = "application"

@@ -1,11 +1,14 @@
-from typing import Dict
+from typing import Dict, List
 
 from logzero import logger
 from pdchaos.middleware import core
 from pdchaos.middleware.core import config, dice, inject, loader, parse
 
+# Application configuration
 loaded_app_config = None
-loaded_attack_config = None
+
+# List of attack actions that are intended for this target (running application)
+loaded_attack_actions = []
 
 
 def register(app_config: config.AppConfig):
@@ -17,67 +20,72 @@ def register(app_config: config.AppConfig):
     _init_attack_loader()
 
 
-def attack(called_path: str, requested_headers: dict):
+def attack(attack_input: Dict = {}, attack_ctx: Dict = {}):
     """Execute chaos"""
-    # Client side configuration
-    if requested_headers and core.HEADER_ATTACK in requested_headers:
-        attacks = parse.attack_as_str(requested_headers.get(core.HEADER_ATTACK))
-        if attacks:
-            _execute_attacks(attacks, called_path)
+    # validate attack schema
+    attack = parse.attack(attack_input)
 
-    # Server side configuration
-    elif loaded_attack_config:
-        attacks = parse.attack_as_dict(loaded_attack_config)
-        if attacks:
-            _execute_attacks(attacks, called_path)
+    # Attack was passed directly
+    if attack:
+        _execute_attacks(
+            target=attack.get(core.ATTACK_KEY_TARGET),
+            attack_actions=attack.get(core.ATTACK_KEY_ACTIONS),
+            attack_ctx=attack_ctx)
+    # Check if there are any attack already loaded for this target
+    elif loaded_attack_actions and len(loaded_attack_actions) > 0:
+        _execute_attacks(
+            attack_actions=loaded_attack_actions,
+            attack_ctx=attack_ctx)
 
 
-def _set_attack(attack: Dict):
+def _set_attack_action(attack_action: List[Dict]):
     try:
         # Validate
-        parsed_attack = parse.attack_as_dict(attack)
+        parsed_attack_actions = parse.attack_actions(attack_action)
         # Configure
-        global loaded_attack_config
-        loaded_attack_config = parsed_attack
-        logger.debug("New attack configuration: {}".format(attack))
+        global loaded_attack_actions
+        loaded_attack_actions = parsed_attack_actions
+        logger.debug("Current attack actions: {}".format(loaded_attack_actions))
     except Exception as e:
         logger.warning("Unable to set attack configuration. Reason: {}".format(e))
 
 
 def _init_attack_loader():
     attack_loader = loader.get(loaded_app_config)
-    attack_loader.load(_set_attack)
+    if attack_loader:
+        attack_loader.load(_set_attack_action)
 
 
-def _execute_attacks(attacks, called_path):
-    for _attack in attacks:
-        _is_lucky_to_be_attacked = dice.roll(_attack.get(core.ATTACK_KEY_PROBABILITY))
+def _execute_attacks(target=None, attack_actions=None, attack_ctx={}):
+    for action in attack_actions:
 
+        if not _is_app_targeted(target):
+            continue
+
+        _is_lucky_to_be_attacked = dice.roll(action.get(core.ATTACK_KEY_PROBABILITY))
         if not _is_lucky_to_be_attacked:
             continue
 
-        if not _is_aimed_for_attack(_attack, called_path):
+        # for now we assume that all actions (delay, fault) contain route
+        route = action.get(core.ATTACK_KEY_TARGET_ROUTE)
+        is_route_targeted = (route and route == attack_ctx.get(core.ATTACK_KEY_TARGET_ROUTE)) or not route
+        if not is_route_targeted:
             continue
 
-        if _attack[core.ATTACK_KEY_ACTION] == core.ATTACK_ACTION_DELAY:
-            inject.delay(_attack[core.ATTACK_KEY_VALUE])
+        if action[core.ATTACK_KEY_ACTION_NAME] == core.ATTACK_ACTION_DELAY:
+            inject.delay(action[core.ATTACK_KEY_VALUE])
 
-        if _attack[core.ATTACK_KEY_ACTION] == core.ATTACK_ACTION_FAULT:
-            inject.failure(_attack[core.ATTACK_KEY_VALUE])
+        if action[core.ATTACK_KEY_ACTION_NAME] == core.ATTACK_ACTION_FAULT:
+            inject.failure(action[core.ATTACK_KEY_VALUE])
 
 
-def _is_aimed_for_attack(_attack, called_route):
-    target = _attack.get(core.ATTACK_KEY_TARGET)
-
+def _is_app_targeted(target):
     if not target:
         return True
 
-    service = target.get(core.ATTACK_KEY_TARGET_SERVICE)
-    is_svc_targeted = \
-        (service and service == loaded_app_config.get(config.AppConfig.APPLICATION_NAME)) \
-        or not service
+    application = target.get(core.ATTACK_KEY_TARGET_APPLICATION)
+    is_app_targeted = \
+        (application and application == loaded_app_config.get(config.AppConfig.APPLICATION_NAME)) \
+        or not application
 
-    route = target.get(core.ATTACK_KEY_TARGET_ROUTE)
-    is_route_targeted = (route and route == called_route) or not route
-
-    return is_svc_targeted and is_route_targeted
+    return is_app_targeted

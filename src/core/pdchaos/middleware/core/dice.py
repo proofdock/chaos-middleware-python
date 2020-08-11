@@ -4,8 +4,6 @@ from logzero import logger
 
 
 def roll(input_probability: str) -> bool:
-    logger.debug("Initiate '{}'".format(roll.__name__))
-
     if not input_probability:
         return True
 

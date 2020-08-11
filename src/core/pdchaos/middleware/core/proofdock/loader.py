@@ -17,18 +17,19 @@ class ProofdockAttackLoader(AttackLoader):
         self._trigger_load_timer(set_attack_func)
 
     def _trigger_load_timer(self, set_attack_func: Callable[[Dict], None]):
-        threading.Timer(interval=30.0, function=self._load_task, args=(set_attack_func,)).start()
+        threading.Timer(interval=10.0, function=self._load_task, args=(set_attack_func,)).start()
 
-    def _load_task(self, set_attack_func: Callable[[Dict], None]):
-        if not bool(self._app_config.get(AppConfig.API_TOKEN) and self._app_config.get(AppConfig.APPLICATION_NAME)):
+    def _load_task(self, set_attacks_action_func: Callable[[Dict], None]):
+        if not bool(self._app_config.get(AppConfig.PROOFDOCK_API_TOKEN)
+                    and self._app_config.get(AppConfig.APPLICATION_NAME)):
             raise Exception('Please set an API token and a service name in your configuration')
-        with client_session(self._app_config.get(AppConfig.API_TOKEN), verify_tls=False) as session:
+        with client_session(self._app_config.get(AppConfig.PROOFDOCK_API_TOKEN), verify_tls=False) as session:
             response = self._request(session)
-            set_attack_func(response)
-        self._trigger_load_timer(set_attack_func)
+            set_attacks_action_func(response)
+        self._trigger_load_timer(set_attacks_action_func)
 
     def _request(self, session):
-        _api_url = self._app_config.get(AppConfig.API_URL, default="https://api.proofdock.io")
+        _api_url = self._app_config.get(AppConfig.PROOFDOCK_API_URL, "https://api.proofdock.io")
         payload = json.dumps({
             "id": self._app_config.get(AppConfig.APPLICATION_ID),
             "env": self._app_config.get(AppConfig.APPLICATION_ENV),
