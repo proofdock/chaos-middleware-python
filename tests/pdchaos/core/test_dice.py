@@ -13,15 +13,20 @@ def test_dice_roll_with_too_high_number():
     assert not result
 
 
+def test_dice_roll_100_percent():
+    result = dice.roll("100")
+    assert result
+
+
 @patch('pdchaos.middleware.core.dice.random')
-def test_dice_roll(random):
+def test_dice_roll_below_fifty_percent(random):
     random.randint.return_value = 49
     result = dice.roll("50")
     assert result
 
 
 @patch('pdchaos.middleware.core.dice.random')
-def test_dice_roll(random):
+def test_dice_roll_above_fifty_percent(random):
     random.randint.return_value = 99
     result = dice.roll("50")
     assert not result

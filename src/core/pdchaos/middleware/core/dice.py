@@ -4,21 +4,24 @@ from logzero import logger
 
 
 def roll(input_probability: str) -> bool:
+    _min = 1
+    _max = 100
+    err_msg = "Skipping probability. Provided value '{}' is {}. Enter a number from 1 to 100."
+
     if not input_probability:
         return True
 
     try:
         probability = int(input_probability)
-        _min = 1
-        _max = 100
-        if _min <= probability <= _max:
+
+        if probability == 100:
+            return True
+        elif _min <= probability <= _max:
             rolled_value = random.randint(_min, _max)
             return rolled_value <= probability
         else:
-            logger.warning(
-                "Skipping probability '{}'. Provided number is out of range. Enter a number between 1 and 100.".format(
-                    roll.__name__))
+            logger.warning(err_msg.format(probability, "out of range"))
             return False
     except ValueError:
-        logger.warning("Skipping probability '{}'. '{}' is not a valid value.".format(roll.__name__, input_probability))
+        logger.warning(err_msg.format(input_probability, "invalid"))
         return False
