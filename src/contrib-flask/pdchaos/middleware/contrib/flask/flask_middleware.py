@@ -4,7 +4,7 @@ from flask import Flask, request
 from logzero import logger
 
 from pdchaos.middleware.contrib.flask.config import FlaskConfig
-from pdchaos.middleware.core import (ATTACK_KEY_TARGET_ROUTE, HEADER_ATTACK,
+from pdchaos.middleware.core import (ATTACK_KEY_ROUTE, HEADER_ATTACK,
                                      chaos)
 
 
@@ -17,7 +17,7 @@ def _after_request(response):
         if HEADER_ATTACK in request.headers:
             attack = json.loads(request.headers.get(HEADER_ATTACK))
 
-        attack_ctx = {ATTACK_KEY_TARGET_ROUTE: request.path}
+        attack_ctx = {ATTACK_KEY_ROUTE: request.path}
         chaos.attack(attack, attack_ctx)
     except Exception as ex:
         logger.error("Unable to performa chaos attack. Error: %s", ex, stack_info=True)

@@ -8,7 +8,7 @@ from tests.data import attack_config_provider, app_config_provider
 
 
 @patch('pdchaos.middleware.core.chaos.inject')
-def test_core_with_header_attack_delay(inject):
+def test_chaos_with_header_attack_delay(inject):
     attack = {"actions": [{"name": "delay", "value": "3"}]}
 
     chaos.attack(attack)
@@ -19,7 +19,7 @@ def test_core_with_header_attack_delay(inject):
 
 @patch('pdchaos.middleware.core.chaos.inject')
 @patch('pdchaos.middleware.core.chaos.dice')
-def test_core_with_header_attack_delay_and_high_probability(dice, inject):
+def test_chaos_with_header_attack_delay_and_high_probability(dice, inject):
     attack = {"actions": [{"name": "delay", "value": "3", "probability": "80"}]}
 
     dice.roll.return_value = True
@@ -31,7 +31,7 @@ def test_core_with_header_attack_delay_and_high_probability(dice, inject):
 
 @patch('pdchaos.middleware.core.chaos.inject')
 @patch('pdchaos.middleware.core.chaos.dice')
-def test_core_with_header_attack_delay_and_low_probability(dice, inject):
+def test_chaos_with_header_attack_delay_and_low_probability(dice, inject):
     attack = {"actions": [{"name": "delay", "value": "3", "probability": "1"}]}
 
     dice.roll.return_value = False
@@ -42,7 +42,7 @@ def test_core_with_header_attack_delay_and_low_probability(dice, inject):
 
 
 @patch('pdchaos.middleware.core.chaos.inject')
-def test_core_with_header_attack_fault(inject):
+def test_chaos_with_header_attack_fault(inject):
     failure_value = 'DoesNotExistError'
     attack = {"actions": [{"name": "fault", "value": "DoesNotExistError"}]}
     chaos.attack(attack)
@@ -52,14 +52,14 @@ def test_core_with_header_attack_fault(inject):
 
 
 @patch('pdchaos.middleware.core.chaos.inject')
-def test_core_with_target_based_header_attack_fault(inject):
+def test_chaos_with_target_and_route_based_header_attack_fault(inject):
     # arrange
     failure_value = 'DoesNotExistError'
     attack = {
         "target": {"application": "A"},
         "actions": [
             {"name": "fault", "value": "DoesNotExistError", "route": "/hello"}
-         ]}
+        ]}
     chaos.loaded_app_config = {AppConfig.APPLICATION_NAME: 'A'}
 
     # act
@@ -74,7 +74,7 @@ def test_core_with_target_based_header_attack_fault(inject):
 
 
 @patch('pdchaos.middleware.core.chaos.inject')
-def test_core_with_attack_configuration(inject):
+def test_chaos_with_attack_configuration(inject):
     # arrange
     chaos.loaded_attack_actions = attack_config_provider.default()
 
@@ -91,7 +91,7 @@ def test_core_with_attack_configuration(inject):
 
 
 @patch('pdchaos.middleware.core.chaos.inject')
-def test_core_with_invalid_attack_configuration(inject):
+def test_chaos_with_invalid_attack_configuration(inject):
     # arrange
     chaos.loaded_app_config = attack_config_provider.invalid()
 
@@ -107,7 +107,7 @@ def test_core_with_invalid_attack_configuration(inject):
 
 
 @patch('pdchaos.middleware.core.chaos.loader')
-def test_core_and_its_register(loader_factory):
+def test_chaos_and_its_register(loader_factory):
     # arrange
     loader_mock = Mock()
     loader_factory.get.return_value = loader_mock
@@ -120,3 +120,61 @@ def test_core_and_its_register(loader_factory):
 
     # assert
     assert loader_mock.load.called_once_with(app_config_provider.default())
+
+
+def test_chaos_route_unconfigured_action_route_():
+    # Arrange
+    action_route = ""
+    attack_ctx_route = "/users"
+
+    assert chaos._is_route_targeted(attack_ctx_route, action_route)
+
+
+def test_chaos_route_configured_and_matched_action_route():
+    # Arrange
+    action_route = "/users"
+    attack_ctx_route = "/users"
+
+    assert chaos._is_route_targeted(attack_ctx_route, action_route)
+
+
+def test_chaos_route_configured_and_unmatched_action_route():
+    # Arrange
+    action_route = "/users"
+    attack_ctx_route = "/hello"
+
+    assert not chaos._is_route_targeted(attack_ctx_route, action_route)
+
+
+def test_chaos_route_configured_and_matched_asterisk_action_route():
+    # Arrange
+    action_route = "/users/*/posts/*"
+    attack_ctx_route = "/users/53a2-45b1-982e-6042c/posts/57a2-1db1-461e-60d42?utm_source=facebook&utm_medium=social" \
+                       "&utm_campaign=facebook "
+
+    assert chaos._is_route_targeted(attack_ctx_route, action_route)
+
+
+def test_chaos_route_configured_and_unmatched_asterisk_action_route():
+    # Arrange
+    action_route = "/user/*/post/*"
+    attack_ctx_route = "/users/53a2-45b1-982e-6042c/posts/57a2-1db1-461e-60d42?utm_source=facebook&utm_medium=social" \
+                       "&utm_campaign=facebook "
+
+    assert not chaos._is_route_targeted(attack_ctx_route, action_route)
+
+
+def test_chaos_route_configured_and_unmatched_asterisk_action_route_empty_string():
+    # Arrange
+    action_route = "/user/*/post/*"
+    attack_ctx_route = ""
+
+    assert chaos._is_route_targeted(attack_ctx_route, action_route)
+
+
+def test_chaos_route_configured_and_unmatched_asterisk_action_route_none():
+    # Arrange
+    action_route = "/user/*/post/*"
+    attack_ctx_route = None
+
+    assert chaos._is_route_targeted(attack_ctx_route, action_route)

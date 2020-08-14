@@ -1,3 +1,4 @@
+import re
 from typing import Dict, List
 
 from logzero import logger
@@ -22,16 +23,18 @@ def register(app_config: config.AppConfig):
 
 def attack(attack_input: Dict = {}, attack_ctx: Dict = {}):
     """Execute chaos"""
-    # validate attack schema
+
+    # Validate attack schema
     attack = parse.attack(attack_input)
 
-    # Attack was passed directly
+    # Attack from request header: from client
     if attack:
         _execute_attacks(
             target=attack.get(core.ATTACK_KEY_TARGET),
             attack_actions=attack.get(core.ATTACK_KEY_ACTIONS),
             attack_ctx=attack_ctx)
-    # Check if there are any attack already loaded for this target
+
+    # Attack from attack configuration: from Chaos API
     elif loaded_attack_actions and len(loaded_attack_actions) > 0:
         _execute_attacks(
             attack_actions=loaded_attack_actions,
@@ -62,14 +65,10 @@ def _execute_attacks(target=None, attack_actions=None, attack_ctx={}):
         if not _is_app_targeted(target):
             continue
 
-        _is_lucky_to_be_attacked = dice.roll(action.get(core.ATTACK_KEY_PROBABILITY))
-        if not _is_lucky_to_be_attacked:
+        if not _is_route_targeted(action.get(core.ATTACK_KEY_ROUTE), attack_ctx.get(core.ATTACK_KEY_ROUTE)):
             continue
 
-        # for now we assume that all actions (delay, fault) contain route
-        route = action.get(core.ATTACK_KEY_TARGET_ROUTE)
-        is_route_targeted = (route and route == attack_ctx.get(core.ATTACK_KEY_TARGET_ROUTE)) or not route
-        if not is_route_targeted:
+        if not _is_lucky_to_be_attacked(action.get(core.ATTACK_KEY_PROBABILITY)):
             continue
 
         if action[core.ATTACK_KEY_ACTION_NAME] == core.ATTACK_ACTION_DELAY:
@@ -77,6 +76,22 @@ def _execute_attacks(target=None, attack_actions=None, attack_ctx={}):
 
         if action[core.ATTACK_KEY_ACTION_NAME] == core.ATTACK_ACTION_FAULT:
             inject.failure(action[core.ATTACK_KEY_VALUE])
+
+
+def _is_lucky_to_be_attacked(probability):
+    is_lucky = dice.roll(probability)
+
+    return is_lucky
+
+
+def _is_route_targeted(attack_ctx_route, action_route):
+    if not action_route or not attack_ctx_route:
+        return True
+
+    text = action_route.replace("/*/", "/[\\w-]*/")
+    is_route_targeted = re.search(text, attack_ctx_route)
+
+    return is_route_targeted
 
 
 def _is_app_targeted(target):
