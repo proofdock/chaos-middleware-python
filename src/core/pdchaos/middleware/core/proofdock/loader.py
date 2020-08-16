@@ -27,13 +27,11 @@ class ProofdockAttackLoader(AttackLoader):
             except Exception as e:
                 logger.warn(str(e))
 
-    # Recovery should be 120 at least
-    # Timeout should be 13
     @circuit(expected_exception=(requests.RequestException, requests.ConnectionError, requests.ConnectTimeout),
-             failure_threshold=5, recovery_timeout=30)
+             failure_threshold=5, recovery_timeout=120)
     def _synchronize(self, session, set_attacks_action_func):
         # Arrange
-        timeout_in_seconds = 5
+        timeout_in_seconds = 13
         api_url = self._app_config.get(AppConfig.PROOFDOCK_API_URL, "https://chaosapi.proofdock.io")
         payload = json.dumps({
             "id": self._app_config.get(AppConfig.APPLICATION_ID),
