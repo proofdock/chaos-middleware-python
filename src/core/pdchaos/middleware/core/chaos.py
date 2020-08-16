@@ -6,6 +6,8 @@ from pdchaos.middleware import core
 from pdchaos.middleware.core import config, dice, inject, loader, parse
 
 # Application configuration
+from pdchaos.middleware.core.inject import ChaosMiddlewareError
+
 loaded_app_config = None
 
 # List of attack actions that are intended for this target (running application)
@@ -24,33 +26,41 @@ def register(app_config: config.AppConfig):
 def attack(attack_input: Dict = {}, attack_ctx: Dict = {}):
     """Execute chaos"""
 
-    # Validate attack schema
-    attack = parse.attack(attack_input)
+    try:
+        # Validate attack schema
+        attack = parse.attack(attack_input)
 
-    # Attack from request header: from client
-    if attack:
-        _execute_attacks(
-            target=attack.get(core.ATTACK_KEY_TARGET),
-            attack_actions=attack.get(core.ATTACK_KEY_ACTIONS),
-            attack_ctx=attack_ctx)
+        # Attack from request header: from client
+        if attack:
+            _execute_attacks(
+                target=attack.get(core.ATTACK_KEY_TARGET),
+                attack_actions=attack.get(core.ATTACK_KEY_ACTIONS),
+                attack_ctx=attack_ctx)
 
-    # Attack from attack configuration: from Chaos API
-    elif loaded_attack_actions and len(loaded_attack_actions) > 0:
-        _execute_attacks(
-            attack_actions=loaded_attack_actions,
-            attack_ctx=attack_ctx)
+        # Attack from attack configuration: from Chaos API
+        elif loaded_attack_actions and len(loaded_attack_actions) > 0:
+            _execute_attacks(
+                attack_actions=loaded_attack_actions,
+                attack_ctx=attack_ctx)
+
+    except ChaosMiddlewareError as error:
+        if error.__cause__:
+            raise error.__cause__
+        else:
+            raise error
+
+    except Exception as ex:
+        logger.error("Unable to perform chaos attack. Error: %s", ex, stack_info=True)
 
 
 def _set_attack_action(attack_action: List[Dict]):
-    try:
-        # Validate
-        parsed_attack_actions = parse.attack_actions(attack_action)
-        # Configure
-        global loaded_attack_actions
-        loaded_attack_actions = parsed_attack_actions
-        logger.debug("Current attack actions: {}".format(loaded_attack_actions))
-    except Exception as e:
-        logger.warning("Unable to set attack configuration. Reason: {}".format(e))
+    # Validate
+    parsed_attack_actions = parse.attack_actions(attack_action)
+
+    # Configure
+    global loaded_attack_actions
+    loaded_attack_actions = parsed_attack_actions
+    logger.debug("Current attack actions: {}".format(loaded_attack_actions))
 
 
 def _init_attack_loader():

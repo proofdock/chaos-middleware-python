@@ -19,18 +19,18 @@ def delay(input_seconds):
         return
 
 
-class MiddlewareDisruptionException(Exception):
+class ChaosMiddlewareError(Exception):
     pass
 
 
 def failure(input_exception: str):
-    """Raise an exception. If exception is not found then a ChaosMiddlewareException is raised."""
+    """Raise an exception. If exception is not found then a MiddlewareDisruptionException is raised."""
     exception = pydoc.locate(input_exception)
 
     if exception:
         logger.debug("Raising exception '{}'".format(input_exception))
-        raise exception
+        raise ChaosMiddlewareError from exception
 
     logger.warning("'{}' is not a valid exception. Raising default exception '{}'.".format(
-        MiddlewareDisruptionException.__name__, input_exception))
-    raise MiddlewareDisruptionException
+        input_exception, ChaosMiddlewareError.__name__))
+    raise ChaosMiddlewareError

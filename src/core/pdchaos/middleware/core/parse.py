@@ -28,5 +28,4 @@ def attack_actions(_input: List[Dict]) -> List[model.AttackActionSchema]:
     except marshmallow.ValidationError as x:
         logger.warning(WARN_MSG, x)
         result = []
-
     return result

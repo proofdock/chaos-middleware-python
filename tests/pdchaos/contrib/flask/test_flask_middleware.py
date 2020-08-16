@@ -2,10 +2,10 @@ from unittest import mock
 from unittest.mock import ANY, patch
 
 import flask
-
+import pytest
 from pdchaos.middleware.contrib.flask import flask_middleware
 from pdchaos.middleware.core import HEADER_ATTACK
-from pdchaos.middleware.core.inject import MiddlewareDisruptionException
+from pdchaos.middleware.core.inject import ChaosMiddlewareError
 
 
 class FlaskTestException(Exception):
@@ -72,12 +72,10 @@ class TestFlaskMiddleware:
             app.process_response(None)
 
     def test_call_with_header_attack_fault(self):
-        # issue: exception handling ? wrapping?? https://github.com/proofdock/chaos-middleware-python/issues/27
-        # attack_request = '{"actions": [{"name": "fault", "value": "DoesNotExistError"}]}'
-        # app = self.create_app()
-        # flask_middleware.FlaskMiddleware(app=app)
+        attack_request = '{"actions": [{"name": "fault", "value": "DoesNotExistError"}]}'
+        app = self.create_app()
+        flask_middleware.FlaskMiddleware(app=app)
 
-        # with app.test_request_context(path='/wiki', headers={HEADER_ATTACK: attack_request}):
-        #     with pytest.raises(MiddlewareDisruptionException):
-        #         app.process_response(None)
-        pass
+        with app.test_request_context(path='/wiki', headers={HEADER_ATTACK: attack_request}):
+            with pytest.raises(ChaosMiddlewareError):
+                app.process_response(None)

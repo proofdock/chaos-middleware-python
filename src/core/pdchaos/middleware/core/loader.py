@@ -24,7 +24,7 @@ class AttackLoader(metaclass=ABCMeta):
     def load(self, set_attacks_action_func: Callable[[Dict], None]):
         """ Load function. Call callback function to set new attack actions.  """
         if self.is_allowed_to_call_endpoint():
-            interval = 5
+            interval = 30
             cancel_future_calls, future = call_repeatedly(interval, self.run, set_attacks_action_func)
             self._cancel_synch_operation = cancel_future_calls
             self._set_attacks_action_func = set_attacks_action_func

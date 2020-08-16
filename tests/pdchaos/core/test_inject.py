@@ -21,10 +21,10 @@ def test_inject_invalid_delay():
 
 
 def test_successful_inject_specified_exception():
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(inject.ChaosMiddlewareError):
         inject.failure('NotImplementedError')
 
 
 def test_successful_inject_default_exception():
-    with pytest.raises(inject.MiddlewareDisruptionException):
+    with pytest.raises(inject.ChaosMiddlewareError):
         inject.failure('DoesNotExistError')
