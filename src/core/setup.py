@@ -42,6 +42,7 @@ setup(
     license='Apache-2.0',
     python_requires='>=3.5.*',
     install_requires=[
+        'circuitbreaker',
         'contextvars;python_version<"3.7"',
         'logzero',
         'marshmallow',

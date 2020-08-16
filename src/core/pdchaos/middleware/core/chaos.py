@@ -88,7 +88,7 @@ def _is_route_targeted(attack_ctx_route, action_route):
     if not action_route or not attack_ctx_route:
         return True
 
-    text = action_route.replace("/*/", "/[\\w-]*/")
+    text = action_route.replace("/*", "/[\\w-]*")
     is_route_targeted = re.search(text, attack_ctx_route)
 
     return is_route_targeted

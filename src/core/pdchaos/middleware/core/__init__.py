@@ -1,3 +1,6 @@
+import threading
+from concurrent.futures.thread import ThreadPoolExecutor
+
 HEADER_ATTACK = "x-proofdock-attack"
 
 # Attack actions keys
@@ -12,3 +15,14 @@ ATTACK_KEY_PROBABILITY = "probability"
 # Target keys
 ATTACK_KEY_TARGET = "target"
 ATTACK_KEY_TARGET_APPLICATION = "application"
+
+
+def call_repeatedly(interval, func, *args):
+    stopped = threading.Event()
+
+    def loop():
+        while not stopped.wait(interval):
+            func(*args)
+
+    future = ThreadPoolExecutor(max_workers=1).submit(loop)
+    return stopped.set, future
