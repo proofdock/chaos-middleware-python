@@ -1,0 +1,61 @@
+trigger: none
+pr: none
+
+stages:
+  - stage: deploy
+    displayName: deploy:production
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - deployment: production
+        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/master'))
+        pool:
+          vmImage: "ubuntu-latest"
+        environment: production
+        variables:
+          - group: shared
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+                - task: TwineAuthenticate@1
+                  displayName: 'Authenticate'
+                  inputs:
+                    pythonUploadServiceConnection: 'PyPI - production'
+                - script: |
+                    # Return immediately on any error and print error output to standard error output.
+                    set -ev
+
+                    BASEDIR=$PWD
+
+                    # Ensure that we have the latest versions of Twine, Wheel, and Setuptools.
+                    python -m pip install --upgrade twine wheel setuptools
+
+                    # Build the distributions.
+                    for d in src/*/ ; do
+                      pushd .
+                      cd "$d"
+                      python setup.py bdist_wheel --dist-dir "$BASEDIR/dist/"
+                      popd
+                    done
+
+                    # Upload the distributions.
+                    for p in dist/* ; do
+                      twine upload --skip-existing $p
+                    done
+                  displayName: 'Upload packages'
+                - script: |
+                    # Return immediately on any error and print error output to standard error output.
+                    set -ev
+
+                    BASEDIR=$PWD
+
+                    # Collect the documentation pages.
+                    mkdir -p "$BASEDIR/docs" && cp README.md "$BASEDIR/docs"
+                    mkdir -p "$BASEDIR/docs/core" && cp src/core/README.md "$BASEDIR/docs/core"
+                    mkdir -p "$BASEDIR/docs/flask" && cp src/contrib-flask/README.md "$BASEDIR/docs/flask"
+                  displayName: 'Collect documentation pages'
+                - task: PublishPipelineArtifact@1
+                  inputs:
+                    targetPath: "docs"
+                    artifactName: "chaos-middleware-python-docs"

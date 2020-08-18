@@ -16,29 +16,30 @@ the rules of the DCO before submitting a PR.
 
 ### Develop
 
-If you wish to develop on this project, make sure to install the development
-dependencies. But first, [create a virtual environment][venv] and then install
-those dependencies.
+Developing on this project requires you to set up a development environment:
 
-[venv]: http://chaostoolkit.org/reference/usage/install/#create-a-virtual-environment
+1. We strongly encourage you to [set up a virtual environment][venv].
+2. Install the dev dependencies in your development environment. The dev dependencies instruct pip to install the testing package `pytest`, the code style checker `flake8` and other development-related packages:
+   ```console
+   $ pip install -r requirements-dev.txt
+   ```
+3. Deploy the project source in [Development Mode][setuptools_development_mode]. This deployment is done in such a way that changes to the project source are immediately available in your development environment, without needing to run a build or install step after each change:
+   ```console
+   $ python setup.py develop
+   ```
+4. In case you want to use the chaos middleware project in your service application in "Development Mode":
+   ```
+   pip install -e /path/to/chaos-middleware-python/src/core
+   pip install -e /path/to/chaos-middleware-python/src/contrib-flask
+   pip install -e /path/to/chaos-middleware-python/src/contrib-*
+   ```
 
-```console
-$ pip install -r requirements-dev.txt -r requirements.txt
-```
 
-Then, point your environment to this directory:
+[venv]: https://docs.python.org/3/library/venv.html
+[setuptools_development_mode]: https://setuptools.readthedocs.io/en/latest/setuptools.html#id41
 
-```console
-$ python setup.py develop
-```
 
-Now, you can edit the files and they will be automatically be seen by your
-environment, even when running from the `chaos` command locally.
+### Verify
 
-### Test
-
-To run the tests for the project execute the following:
-
-```
-$ pytest
-```
+* Verify your **tests** are green by running `$ pytest` from the project's root folder
+* Validate your **code style and formatting rules** by running `$ flake8 src/` from the project's root folder
