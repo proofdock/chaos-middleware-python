@@ -18,10 +18,17 @@ stages:
             deploy:
               steps:
                 - download: none
+                - checkout: self
+                  persistCredentials: true
+                - task: UsePythonVersion@0
+                  inputs:
+                    versionSpec: '3.8'
+                    addToPath: true
+                    architecture: 'x64'
                 - task: TwineAuthenticate@1
                   displayName: 'Authenticate'
                   inputs:
-                    pythonUploadServiceConnection: 'PyPI - production'
+                    pythonUploadServiceConnection: 'PyPI - production - middleware'
                 - script: |
                     # Return immediately on any error and print error output to standard error output.
                     set -ev
@@ -32,16 +39,16 @@ stages:
                     python -m pip install --upgrade twine wheel setuptools
 
                     # Build the distributions.
-                    for d in src/*/ ; do
+                    for dir in src/*/ ; do
                       pushd .
-                      cd "$d"
+                      cd "$dir"
                       python setup.py bdist_wheel --dist-dir "$BASEDIR/dist/"
                       popd
                     done
 
                     # Upload the distributions.
-                    for p in dist/* ; do
-                      twine upload --config-file $(PYPIRC_PATH) --skip-existing $p
+                    for package in dist/* ; do
+                      twine upload --repository proofdock-chaos-middleware --config-file $(PYPIRC_PATH) --skip-existing $package
                     done
                   displayName: 'Upload packages'
                 - script: |
