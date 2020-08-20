@@ -41,7 +41,7 @@ stages:
 
                     # Upload the distributions.
                     for p in dist/* ; do
-                      twine upload --skip-existing $p
+                      twine upload --config-file $(PYPIRC_PATH) --skip-existing $p
                     done
                   displayName: 'Upload packages'
                 - script: |
