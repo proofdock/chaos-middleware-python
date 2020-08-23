@@ -75,7 +75,7 @@ def _execute_attacks(target=None, attack_actions=None, attack_ctx={}):
         if not _is_app_targeted(target):
             continue
 
-        if not _is_route_targeted(action.get(core.ATTACK_KEY_ROUTE), attack_ctx.get(core.ATTACK_KEY_ROUTE)):
+        if not _is_route_targeted(attack_ctx.get(core.ATTACK_KEY_ROUTE), action.get(core.ATTACK_KEY_ROUTE)):
             continue
 
         if not _is_lucky_to_be_attacked(action.get(core.ATTACK_KEY_PROBABILITY)):

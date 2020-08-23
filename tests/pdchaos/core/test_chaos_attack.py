@@ -151,3 +151,19 @@ def test_chaos_with_invalid_attack_configuration(inject):
     # assert
     assert not inject.delay.called, 'Delay should not have been called'
     assert not inject.failure.called, 'Failure should not have been called'
+
+
+@patch('pdchaos.middleware.core.chaos.inject')
+def test_chaos_attack_with_regex_route(inject):
+    attack = {
+        "actions": [{"name": "delay", "value": "3", "route": "/v1/*/method"}]
+    }
+
+    # act
+    chaos.attack(attack_input=attack, attack_ctx={"route": "/v1/attacks/method"})
+
+    # clear
+    chaos.loaded_attack_actions = None
+
+    # assert
+    assert inject.delay.call_count == 1
