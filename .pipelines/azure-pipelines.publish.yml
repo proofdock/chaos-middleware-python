@@ -61,6 +61,7 @@ stages:
                     mkdir -p "$BASEDIR/docs" && cp README.md "$BASEDIR/docs"
                     mkdir -p "$BASEDIR/docs/core" && cp src/core/README.md "$BASEDIR/docs/core"
                     mkdir -p "$BASEDIR/docs/flask" && cp src/contrib-flask/README.md "$BASEDIR/docs/flask"
+                    mkdir -p "$BASEDIR/docs/django" && cp src/contrib-django/README.md "$BASEDIR/docs/django"
                   displayName: 'Collect documentation pages'
                 - task: PublishPipelineArtifact@1
                   inputs:

@@ -1,54 +1,65 @@
-# Proofdock chaos middleware for Python
+# Chaos Middleware for Python
 
 ![CI](https://github.com/proofdock/chaos-middleware-python/workflows/CI/badge.svg?branch=master)
 [![Python versions](https://img.shields.io/pypi/pyversions/proofdock-chaos-middleware-python.svg)](https://www.python.org/)
 
-Practice chaos engineering with Python applications. This project is a collection of features to inject failures at the application level. Various Python frameworks are supported.
+The ``Chaos Middleware`` lets you practice chaos engineering on the application level. Put your system into turbulent conditions with application attacks. Inject delays and faults to simulate disbalances in your system. By specifying routes, the ``Chaos Middleware`` enables you to minimize the blast radius and keep the focus on the interesting parts of your application.
 
 ## Project description
 
-This project is part of Proofdock's [**Chaos Platform**][proofdock] that supports you to **attack your service application with turbulent and unexpected conditions** in order to improve its resiliency.
+This project is part of Proofdock's [**Chaos Platform**][proofdock] that lets you **simulate application outages and errors** in order to improve your system's resiliency.
 
-
-## Install
+## Installation & basic usage
 
 This package requires Python 3.5+
 
-The chaos middleware project supports various Python web frameworks. We call those **contribution**'s.
-
-* **Reveal all available contributions** under the `src/contrib-*` directories in our [GitHub repository][proofdock_gh_middleware].
-* **Exemplified at [Flask][flask]**, installation is that easy:
-  ```
-  $ pip install -U proofdock-chaos-middleware-flask
-  ```
-
-* You miss your framework? Contribute *or* let us know.
-
-* You can't contribute? Install the core package and integrate with your application.
+1. Install the Chaos Middleware package:
    ```
    $ pip install -U proofdock-chaos-middleware-python
    ```
 
-## Usage
+1. Register your application to the Chaos Middleware:
+   ```python
+   import uuid
+   
+   from pdchaos.middleware.core import chaos
+   
+   chaos_middleware_config = {
+     'CHAOS_MIDDLEWARE_APPLICATION_NAME': 'example-application-name',
+     'CHAOS_MIDDLEWARE_APPLICATION_ENV': 'example-environment',
+     'CHAOS_MIDDLEWARE_PROOFDOCK_API_TOKEN': 'eyJ0eXAi...05',
+     'CHAOS_MIDDLEWARE_APPLICATION_ID': str(uuid.uuid4()),
+   }
+   config = CustomConfig(chaos_middleware_config)
+   chaos.register(config)
+   ```
 
-Detailed usage instructions are available at the [Proofdock documentation pages][proofdock_docs_middleware].
+1. Attack each request in your application:
+   ```python
+   import json
+   from pdchaos.middleware import core
+   from pdchaos.middleware.core import chaos
+   
+   headers = request.headers
+   attack = json.loads(headers.get(core.HEADER_ATTACK)) if (core.HEADER_ATTACK in headers) else None
+   attack_ctx = {core.ATTACK_KEY_ROUTE: request.path}
+   chaos.attack(attack, attack_ctx)
+   ```
 
-## Configuration
+## Extension
 
-* The chaos middleware expects some configuration variables. Those variables ensure that your service application reacts properly on attacks.
+Chaos Middleware supports integration with popular web frameworks:
+- [Flask](https://github.com/proofdock/chaos-middleware-python/tree/master/src/contrib-flask)
+- [Django](https://github.com/proofdock/chaos-middleware-python/tree/master/src/contrib-django)
 
-* Each contribution has its own way of declaring the configuration values. Respectively head to the contribution packages and read the configuration instructions. You will find those under `src/contrib-*/README.md` in our [GitHub repository][proofdock_gh_middleware] .
+## References
 
+- [Chaos Middleware documentation][proofdock_middleware_docs]
+- [Chaos Middleware repository][proofdock_middleware_repo]
+- [Support][proofdock_support]
+- [Proofdock website][proofdock]
 
-## Contact and support
-
-For more information visit our official [website][proofdock] or [documentation][proofdock_docs]. Feel free to ask for support for this package on [GitHub][proofdock_gh_support].
-
-
-[flask]: https://flask.palletsprojects.com/
 [proofdock]: https://proofdock.io/
-[proofdock_docs]: https://docs.proofdock.io/
-[proofdock_docs_control_panel]: https://docs.proofdock.io/chaos/devops/control-panel
-[proofdock_docs_middleware]: https://docs.proofdock.io/chaos/middleware
-[proofdock_gh_support]: https://github.com/proofdock/chaos-support/
-[proofdock_gh_middleware]: https://github.com/proofdock/chaos-middleware-python
+[proofdock_support]: https://github.com/proofdock/chaos-support/
+[proofdock_middleware_docs]: https://docs.proofdock.io/chaos/middleware/about/
+[proofdock_middleware_repo]: https://github.com/proofdock/chaos-middleware-python

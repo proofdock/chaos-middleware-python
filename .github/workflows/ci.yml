@@ -22,6 +22,7 @@ jobs:
           python -m pip install -r requirements-dev.txt
           python -m pip install src/core
           python -m pip install src/contrib-flask
+          python -m pip install src/contrib-django
       - name: Check code style
         run: flake8 src/
       - name: Run tests

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""A setup module for Proofdock Middleware"""
+"""A setup module for Proofdock's Chaos Middleware"""
 
 from setuptools import setup, find_namespace_packages
 
@@ -46,5 +46,5 @@ setup(
         'flask',
         'proofdock-chaos-middleware-python',
     ],
-    url='https://github.com/proofdock/chaos-middleware-python',
+    url='https://github.com/proofdock/chaos-middleware-python/tree/master/src/contrib-flask',
 )
