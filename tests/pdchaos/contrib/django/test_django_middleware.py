@@ -71,4 +71,4 @@ class TestDjangoMiddleware:
         middleware(django_request)
 
         assert register.call_count == 0
-        assert attack.call_count == 0
+        assert attack.call_count == 1

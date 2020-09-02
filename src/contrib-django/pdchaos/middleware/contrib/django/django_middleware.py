@@ -24,14 +24,9 @@ class DjangoMiddleware:
         # Code to be executed for each request before the view (and later middleware) are called.
 
         response = self.get_response(request)
-        try:
-            if settings.CHAOS_MIDDLEWARE:
-                headers = request.headers
-                attack = json.loads(headers.get(core.HEADER_ATTACK)) if (core.HEADER_ATTACK in headers) else None
-                attack_ctx = {core.ATTACK_KEY_ROUTE: request.path}
-                chaos.attack(attack, attack_ctx)
-
-        except Exception as ex:
-            logger.error("Unable to apply chaos middleware. Error: %s", ex, stack_info=True)
+        headers = request.headers
+        attack = json.loads(headers.get(core.HEADER_ATTACK)) if (core.HEADER_ATTACK in headers) else None
+        attack_ctx = {core.ATTACK_KEY_ROUTE: request.path}
+        chaos.attack(attack, attack_ctx)
 
         return response
