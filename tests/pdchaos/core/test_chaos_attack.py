@@ -9,7 +9,7 @@ from tests.data import attack_config_provider
 
 
 @patch('pdchaos.middleware.core.chaos.inject')
-def test_chaos_attack_that_is_not_targeted(inject):
+def test_chaos_attack_that_is_not_targeted_by_name(inject):
     attack = {
         "actions": [{"name": "delay", "value": "3"}],
         "target": {"application": "B"}
@@ -24,14 +24,31 @@ def test_chaos_attack_that_is_not_targeted(inject):
 
 
 @patch('pdchaos.middleware.core.chaos.inject')
-def test_chaos_attack_that_is_targeted(inject):
+def test_chaos_attack_that_is_not_targeted_by_env(inject):
     attack = {
         "actions": [{"name": "delay", "value": "3"}],
-        "target": {"application": "A"}
+        "target": {"application": "A", "environment": "sandbox"}
     }
 
     chaos.loaded_app_config = {
-        AppConfig.APPLICATION_NAME: "A"
+        AppConfig.APPLICATION_NAME: "A",
+        AppConfig.APPLICATION_ENV: "prod"
+    }
+    chaos.attack(attack)
+
+    assert not inject.delay.called, 'Delay should not have been called'
+
+
+@patch('pdchaos.middleware.core.chaos.inject')
+def test_chaos_attack_that_is_targeted(inject):
+    attack = {
+        "actions": [{"name": "delay", "value": "3"}],
+        "target": {"application": "A", "environment": "sandbox"}
+    }
+
+    chaos.loaded_app_config = {
+        AppConfig.APPLICATION_NAME: "A",
+        AppConfig.APPLICATION_ENV: "sandbox"
     }
     chaos.attack(attack)
 

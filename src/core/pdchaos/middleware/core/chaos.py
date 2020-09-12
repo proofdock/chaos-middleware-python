@@ -18,9 +18,11 @@ def register(app_config: config.AppConfig):
     """Register an application"""
     if app_config is None:
         raise Exception('Application config is not set')
+
     global loaded_app_config
-    loaded_app_config = app_config
-    _init_attack_loader()
+    if loaded_app_config is None:
+        loaded_app_config = app_config
+        _init_attack_loader()
 
 
 def attack(attack_input: Dict = {}, attack_ctx: Dict = {}):
@@ -109,8 +111,14 @@ def _is_app_targeted(target):
         return True
 
     application = target.get(core.ATTACK_KEY_TARGET_APPLICATION)
+    environment = target.get(core.ATTACK_KEY_TARGET_ENVIRONMENT)
+
     is_app_targeted = \
         (application and application == loaded_app_config.get(config.AppConfig.APPLICATION_NAME)) \
         or not application
 
-    return is_app_targeted
+    is_env_targeted = \
+        (environment and environment == loaded_app_config.get(config.AppConfig.APPLICATION_ENV)) \
+        or not environment
+
+    return is_app_targeted and is_env_targeted

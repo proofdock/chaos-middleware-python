@@ -15,6 +15,7 @@ ATTACK_KEY_PROBABILITY = "probability"
 # Target keys
 ATTACK_KEY_TARGET = "target"
 ATTACK_KEY_TARGET_APPLICATION = "application"
+ATTACK_KEY_TARGET_ENVIRONMENT = "environment"
 
 
 def call_repeatedly(interval, func, *args):
