@@ -19,8 +19,10 @@ class ProofdockAttackLoader(AttackLoader):
         self._app_config = app_config
 
     def is_allowed_to_call_endpoint(self):
-        return bool(
-            self._app_config.get(AppConfig.PROOFDOCK_API_TOKEN) and self._app_config.get(AppConfig.APPLICATION_NAME))
+        token = self._app_config.get(AppConfig.PROOFDOCK_API_TOKEN)
+        name = self._app_config.get(AppConfig.APPLICATION_NAME)
+        id = self._app_config.get(AppConfig.APPLICATION_ID)
+        return bool(token and name and id)
 
     def run(self, set_attacks_action_func: Callable[[Dict], None]):
         with client_session(self._app_config.get(AppConfig.PROOFDOCK_API_TOKEN), verify_tls=False) as session:
