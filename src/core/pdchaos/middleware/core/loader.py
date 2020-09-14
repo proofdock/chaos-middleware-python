@@ -50,11 +50,11 @@ class AttackLoader(metaclass=ABCMeta):
                 self._cancel_synch_operation = None
             else:
                 logger.debug("Unable to cancel synchronize operation")
-            self.reset_attack_actions()
+            self.unload_actions()
 
-    def reset_attack_actions(self):
+    def unload_actions(self):
         self._set_attacks_action_func([])
-        logger.debug("Reset attack actions")
+        logger.debug("Unload attack actions")
 
 
 def get(app_config: AppConfig) -> AttackLoader:
