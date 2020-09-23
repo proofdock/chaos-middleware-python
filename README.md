@@ -1,6 +1,7 @@
 # Chaos Middleware for Python
 
 ![CI](https://github.com/proofdock/chaos-middleware-python/workflows/CI/badge.svg?branch=master)
+![Coverage](https://codecov.io/gh/proofdock/chaos-middleware-python/branch/master/graph/badge.svg)
 [![Python versions](https://img.shields.io/pypi/pyversions/proofdock-chaos-middleware-python.svg)](https://www.python.org/)
 
 The ``Chaos Middleware`` lets you practice chaos engineering on the application level. Put your system into turbulent conditions with application attacks. Inject delays and faults to simulate disbalances in your system. By specifying routes, the ``Chaos Middleware`` enables you to minimize the blast radius and keep the focus on the interesting parts of your application.
