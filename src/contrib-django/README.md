@@ -1,9 +1,9 @@
-# Chaos Middleware Django integration
+# Chaos Middleware for Django
 
 ![CI](https://github.com/proofdock/chaos-middleware-python/workflows/CI/badge.svg?branch=master)
 [![Python versions](https://img.shields.io/pypi/pyversions/proofdock-chaos-middleware-django.svg)](https://www.python.org/)
 
-## Install
+## Installation
 
 This package requires Python 3.5+
 
@@ -40,14 +40,14 @@ CHAOS_MIDDLEWARE = {
 }
 ```
 
+Start your Django application and create an attack using **HTTP request header** or **control panel**. Read more about attacks [here][attack_usage].
+
 ## References
 
-- [Chaos Middleware documentation][proofdock_middleware_docs]
 - [Chaos Middleware repository][proofdock_middleware_repo]
 - [Support][proofdock_support]
-- [Proofdock website][proofdock]
 
 [proofdock]: https://proofdock.io/
-[proofdock_middleware_docs]: https://docs.proofdock.io/chaos/middleware/about/
 [proofdock_support]: https://github.com/proofdock/chaos-support/
 [proofdock_middleware_repo]: https://github.com/proofdock/chaos-middleware-python
+[attack_usage]: https://docs.proofdock.io/chaos/middleware/about/#usage
