@@ -1,4 +1,4 @@
-# Chaos Middleware for Flask
+# Flask integration
 
 ![CI](https://github.com/proofdock/chaos-middleware-python/workflows/CI/badge.svg?branch=master)
 [![Python versions](https://img.shields.io/pypi/pyversions/proofdock-chaos-middleware-flask.svg)](https://www.python.org/)
@@ -46,12 +46,5 @@ if __name__ == "__main__":
 
 Start your Flask application and create an attack using **HTTP request header** or **control panel**. Read more about attacks [here][attack_usage].
 
-## References
 
-- [Chaos Middleware repository][proofdock_middleware_repo]
-- [Support][proofdock_support]
-
-[proofdock]: https://proofdock.io/
-[proofdock_support]: https://github.com/proofdock/chaos-support/
-[proofdock_middleware_repo]: https://github.com/proofdock/chaos-middleware-python
 [attack_usage]: https://docs.proofdock.io/chaos/middleware/about/#usage
