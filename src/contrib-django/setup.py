@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""A setup module for Proofdock's Chaos Middleware"""
+"""Pluggable chaos engineering application for Django projects"""
 
 from setuptools import setup, find_namespace_packages
 
-exec(open('pdchaos/middleware/contrib/django/version.py').read())
+exec(open('pdchaos/application/version.py').read())
 
 setup(
     name='proofdock-chaos-middleware-django',
@@ -34,7 +34,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description='A chaos engineering middleware for Python Django applications.',
+    description='Practice chaos engineering with Python Django projects',
     include_package_data=True,
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
