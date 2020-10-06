@@ -17,7 +17,7 @@ class AttackLoader(metaclass=ABCMeta):
     _set_attacks_action_func = None
 
     @abstractmethod
-    def is_allowed_to_call_endpoint(self, set_attacks_action_func: Callable[[Dict], None]):
+    def is_allowed_to_call_endpoint(self):
         """ Checks whether the loader is allowed to call the endpoint, e.g. when all parameters are set. """
         pass
 
@@ -30,7 +30,7 @@ class AttackLoader(metaclass=ABCMeta):
             self._set_attacks_action_func = set_attacks_action_func
             future.add_done_callback(self.safe_guard)
         else:
-            raise Exception('Is not allowed to call the endpoint')
+            logger.warn('Is not allowed to call the endpoint')
 
     @abstractmethod
     def run(self, set_attacks_action_func: Callable[[Dict], None]):
@@ -57,15 +57,34 @@ class AttackLoader(metaclass=ABCMeta):
         logger.debug("Unload attack actions")
 
 
-def get(app_config: AppConfig) -> AttackLoader:
-    """Load the attack configuration from the API provider"""
-    provider = app_config.get(AppConfig.ATTACK_LOADER, "proofdock")
+def init(loaded_app_config, set_attack_action) -> AttackLoader:
+    """Init the loader"""
+    provider = loaded_app_config.get(AppConfig.ATTACK_LOADER, "proofdock")
 
+    loader = _create_loader(loaded_app_config, provider)
+    loader = _setup_loader(loader, set_attack_action)
+
+    return loader
+
+
+def _setup_loader(loader, set_attack_action):
+    if loader and loader.is_allowed_to_call_endpoint():
+        loader.load(set_attack_action)
+
+    else:
+        logger.info("Missing configuration for the provided loader. Only HEADER types attack will be accepted.")
+        loader = None
+    return loader
+
+
+def _create_loader(loaded_app_config: AppConfig, provider: str):
     if provider == "proofdock":
         from pdchaos.middleware.core.proofdock.loader import ProofdockAttackLoader
-        return ProofdockAttackLoader(app_config)
+        loader = ProofdockAttackLoader(loaded_app_config)
+
     else:
         logger.warning(
             "Unable to find an attack loader provider '{}'. "
             "Please set a valid CHAOS_MIDDLEWARE_ATTACK_LOADER, e.g. 'proofdock'".format(provider))
-        return None
+        loader = None
+    return loader

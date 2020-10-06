@@ -8,7 +8,7 @@ from pdchaos.middleware.core.inject import ChaosMiddlewareError
 from tests.data import attack_config_provider
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_attack_that_is_not_targeted_by_name(inject):
     attack = {
         "actions": [{"name": "delay", "value": "3"}],
@@ -23,7 +23,7 @@ def test_chaos_attack_that_is_not_targeted_by_name(inject):
     assert not inject.delay.called, 'Delay should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_attack_that_is_not_targeted_by_env(inject):
     attack = {
         "actions": [{"name": "delay", "value": "3"}],
@@ -39,7 +39,7 @@ def test_chaos_attack_that_is_not_targeted_by_env(inject):
     assert not inject.delay.called, 'Delay should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_attack_that_is_targeted(inject):
     attack = {
         "actions": [{"name": "delay", "value": "3"}],
@@ -55,7 +55,7 @@ def test_chaos_attack_that_is_targeted(inject):
     assert inject.delay.called, 'Delay should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_with_header_attack_delay(inject):
     attack = {"actions": [{"name": "delay", "value": "3"}]}
 
@@ -65,8 +65,8 @@ def test_chaos_with_header_attack_delay(inject):
     assert not inject.failure.called, 'Raise exception should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
-@patch('pdchaos.middleware.core.chaos.dice')
+@patch('pdchaos.middleware.core.executor.inject')
+@patch('pdchaos.middleware.core.executor.dice')
 def test_chaos_with_header_attack_delay_and_high_probability(dice, inject):
     attack = {"actions": [{"name": "delay", "value": "3", "probability": "80"}]}
 
@@ -77,8 +77,8 @@ def test_chaos_with_header_attack_delay_and_high_probability(dice, inject):
     assert not inject.failure.called, 'Raise exception should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
-@patch('pdchaos.middleware.core.chaos.dice')
+@patch('pdchaos.middleware.core.executor.inject')
+@patch('pdchaos.middleware.core.executor.dice')
 def test_chaos_with_header_attack_delay_and_low_probability(dice, inject):
     attack = {"actions": [{"name": "delay", "value": "3", "probability": "1"}]}
 
@@ -89,7 +89,7 @@ def test_chaos_with_header_attack_delay_and_low_probability(dice, inject):
     assert not inject.failure.called, 'Raise exception should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_with_header_attack_fault(inject):
     failure_value = 'DoesNotExistError'
     attack = {"actions": [{"name": "fault", "value": "DoesNotExistError"}]}
@@ -115,7 +115,7 @@ def test_chaos_with_header_attack_fault_and_unavailable_error():
         chaos.attack(attack)
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_with_target_and_route_based_header_attack_fault(inject):
     # arrange
     failure_value = 'DoesNotExistError'
@@ -137,7 +137,7 @@ def test_chaos_with_target_and_route_based_header_attack_fault(inject):
     inject.failure.assert_called_once_with(failure_value)
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_with_attack_configuration(inject):
     # arrange
     chaos.loaded_attack_actions = attack_config_provider.default()
@@ -154,7 +154,7 @@ def test_chaos_with_attack_configuration(inject):
     assert inject.failure.call_count == 0, 'Failure should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_with_invalid_attack_configuration(inject):
     # arrange
     chaos.loaded_app_config = attack_config_provider.invalid()
@@ -170,7 +170,7 @@ def test_chaos_with_invalid_attack_configuration(inject):
     assert not inject.failure.called, 'Failure should not have been called'
 
 
-@patch('pdchaos.middleware.core.chaos.inject')
+@patch('pdchaos.middleware.core.executor.inject')
 def test_chaos_attack_with_regex_route(inject):
     attack = {
         "actions": [{"name": "delay", "value": "3", "route": "/v1/*/method"}]
